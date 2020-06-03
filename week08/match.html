@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="id" class="cls">
+    <div id="id2" class="cls2"></div>
+  </div>
+  <script>
+    function match(selectors, element) {
+      if (typeof selectors !== 'string' || !element) {
+        return false;
+      }
+      const selectorParseResult = parseSelector(selectors);
+
+      if (selectorParseResult.length === 0) {
+        return false;
+      }
+
+      let isMatch = true;
+      while(element && selectorParseResult.length > 0) {
+        const selector = selectorParseResult.pop();
+
+        if (selector.charAt(0) === '#') {
+          const { id } = element;
+          if (id && id === selector.replace('#', '')) {
+            element = element.parentNode;
+            continue;
+          } else {
+            isMatch = false;
+            break;
+          }
+        } else if(selector.charAt(0) === '.') {
+          if (element.classList.contains(selector.replace('.'))) {
+            element = element.parentNode;
+          } else {
+            isMatch = false;
+            break;
+          }
+        } else {
+          if (element.tagName === selector) {
+            element = element.parentNode;
+          } else {
+            isMatch = false;
+          }
+        }
+      }
+      isMatch = !selectorParseResult.length;
+
+      return isMatch;
+    }
+
+    function parseSelector(selector) {
+      const splitReg = /\s*[>~+\s]\s*/g;
+      return selector.split(splitReg);
+    }
+
+    const isMatch = match('#id2 #id .cls', document.querySelector('#id #id2'));
+
+    console.log(isMatch);
+  </script>
+</body>
+</html>
